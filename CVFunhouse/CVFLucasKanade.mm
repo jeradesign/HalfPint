@@ -18,7 +18,7 @@ using namespace std;
 
 TermCriteria termcrit(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03);
 cv::Size subPixWinSize(10,10), winSize(31,31);
-const int MAX_COUNT = 500;
+const int MAX_COUNT = 200;
 
 @interface CVFLucasKanade () {
     bool hasBeenInited;
@@ -41,7 +41,6 @@ const int MAX_COUNT = 500;
     {
         // automatic initialization
         goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 3, 0, 0.04);
-        cornerSubPix(gray, points[1], subPixWinSize, cv::Size(-1,-1), termcrit);
     }
     else if( !points[0].empty() )
     {
@@ -50,7 +49,7 @@ const int MAX_COUNT = 500;
         if(prevGray.empty())
             gray.copyTo(prevGray);
         calcOpticalFlowPyrLK(prevGray, gray, points[0], points[1], status, err, winSize,
-                             3, termcrit, 0, 0.001);
+                             10, termcrit, 0, 0.001);
         size_t i, k;
         for( i = k = 0; i < points[1].size(); i++ )
         {
@@ -60,7 +59,7 @@ const int MAX_COUNT = 500;
             points[1][k++] = points[1][i];
             circle( image, points[1][i], 3, Scalar(0,255,0), -1, 8);
         }
-        points[1].resize(k);
+        goodFeaturesToTrack(gray, points[1], MAX_COUNT, 0.01, 10, Mat(), 10, 0, 0.04);
     }
     
     hasBeenInited = true;
